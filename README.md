@@ -21,6 +21,32 @@
 | macOS ARM64 | `docker-sync-darwin-arm64` |
 | Windows x86_64 | `docker-sync-windows-amd64.exe` |
 
+#### Linux/macOS 安装
+
+```bash
+# 下载最新版本
+curl -L -o docker-sync https://github.com/shnulaa/lotus-docker-sync/releases/latest/download/docker-sync-linux-amd64
+
+# 添加执行权限
+chmod +x docker-sync
+
+# 移动到系统路径（可选）
+sudo mv docker-sync /usr/local/bin/
+
+# 或者直接运行
+./docker-sync --help
+```
+
+#### Windows 安装
+
+```powershell
+# 下载到当前目录
+Invoke-WebRequest -Uri "https://github.com/shnulaa/lotus-docker-sync/releases/latest/download/docker-sync-windows-amd64.exe" -OutFile "docker-sync.exe"
+
+# 运行
+.\docker-sync.exe --help
+```
+
 ### 2. 登录 GitHub
 
 ```bash
