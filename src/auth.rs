@@ -40,54 +40,63 @@ impl GitHubAuth {
                 .unwrap_or_else(|_| Client::new()),
         }
     }
-    
+
     pub async fn login_with_browser() -> Result<String> {
         let auth = Self::new();
-        
+
         println!("{}", "正在连接 GitHub...".blue());
-        
+
         // 1. 获取设备码
         let device_code_response = auth.get_device_code().await?;
-        
+
         // 2. 显示验证码
         println!();
         println!("{}", "📋 请完成以下步骤:".yellow());
-        println!("1. 在浏览器中打开: {}", device_code_response.verification_uri.cyan());
-        println!("2. 输入验证码: {}", device_code_response.user_code.bright_green().bold());
+        println!(
+            "1. 在浏览器中打开: {}",
+            device_code_response.verification_uri.cyan()
+        );
+        println!(
+            "2. 输入验证码: {}",
+            device_code_response.user_code.bright_green().bold()
+        );
         println!("3. 授权应用");
         println!();
-        
+
         // 尝试打开浏览器（仅在桌面环境）
         #[cfg(windows)]
         {
             let _ = webbrowser::open(&device_code_response.verification_uri);
         }
-        
+
         #[cfg(target_os = "macos")]
         {
             let _ = std::process::Command::new("open")
                 .arg(&device_code_response.verification_uri)
                 .spawn();
         }
-        
+
         #[cfg(target_os = "linux")]
         {
             // Linux 服务器环境不自动打开浏览器，用户手动在本地浏览器打开
         }
-        
+
         println!("{}", "⏳ 等待授权...".blue());
-        
+
         // 3. 轮询获取访问令牌
         let token = auth.poll_for_token(&device_code_response).await?;
-        
+
         Ok(token)
     }
-    
+
     async fn get_device_code(&self) -> Result<DeviceCodeResponse> {
         let mut params = HashMap::new();
         params.insert("client_id", CLIENT_ID);
-        params.insert("scope", "repo workflow write:packages read:packages delete:packages delete_repo admin:repo_hook");
-        
+        params.insert(
+            "scope",
+            "repo workflow write:packages read:packages delete:packages",
+        );
+
         let response = self
             .client
             .post("https://github.com/login/device/code")
@@ -96,34 +105,34 @@ impl GitHubAuth {
             .form(&params)
             .send()
             .await?;
-            
+
         if !response.status().is_success() {
             let error_text = response.text().await?;
             return Err(anyhow!("Failed to get device code: {}", error_text));
         }
-        
+
         let device_code: DeviceCodeResponse = response.json().await?;
         Ok(device_code)
     }
-    
+
     async fn poll_for_token(&self, device_code: &DeviceCodeResponse) -> Result<String> {
         let mut interval = device_code.interval;
         let max_attempts = device_code.expires_in / interval;
         let mut attempts = 0;
-        
+
         loop {
             attempts += 1;
             if attempts > max_attempts {
                 return Err(anyhow!("Authentication timeout. Please try again."));
             }
-            
+
             sleep(Duration::from_secs(interval)).await;
-            
+
             let mut params = HashMap::new();
             params.insert("client_id", CLIENT_ID);
             params.insert("device_code", device_code.device_code.as_str());
             params.insert("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
-            
+
             let response = self
                 .client
                 .post("https://github.com/login/oauth/access_token")
@@ -132,10 +141,10 @@ impl GitHubAuth {
                 .form(&params)
                 .send()
                 .await?;
-                
+
             if response.status().is_success() {
                 let token_response: AccessTokenResponse = response.json().await?;
-                
+
                 if let Some(token) = token_response.access_token {
                     return Ok(token);
                 } else if let Some(error) = token_response.error {
@@ -169,8 +178,11 @@ impl GitHubAuth {
 // 备用：手动创建token页面
 pub fn open_github_token_page() -> Result<()> {
     let token_url = "https://github.com/settings/tokens/new?description=docker-sync-cli&scopes=repo,workflow,write:packages";
-    
-    println!("{}", "🔐 Opening GitHub Personal Access Token creation page...".blue());
+
+    println!(
+        "{}",
+        "🔐 Opening GitHub Personal Access Token creation page...".blue()
+    );
     println!();
     println!("{}", "📋 Please follow these steps:".yellow());
     println!("1. Your browser will open to GitHub token creation page");
@@ -179,16 +191,16 @@ pub fn open_github_token_page() -> Result<()> {
     println!("4. Copy the generated token");
     println!("5. Run: docker-sync auth token YOUR_COPIED_TOKEN");
     println!();
-    
+
     #[cfg(windows)]
     {
         let _ = webbrowser::open(token_url);
     }
-    
+
     #[cfg(not(windows))]
     {
         println!("Please visit: {}", token_url.cyan());
     }
-    
+
     Ok(())
 }
