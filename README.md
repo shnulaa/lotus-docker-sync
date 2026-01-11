@@ -1,4 +1,4 @@
-# Docker Sync
+# Lotus Docker Sync
 
 <p align="center">
   <a href="https://github.com/shnulaa/lotus-docker-sync/releases"><img src="https://img.shields.io/github/v/release/shnulaa/lotus-docker-sync?include_prereleases" alt="最新版本"></a>
