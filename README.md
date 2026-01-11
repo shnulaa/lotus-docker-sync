@@ -1,5 +1,11 @@
 # Docker Sync
 
+<p align="center">
+  <a href="https://github.com/shnulaa/lotus-docker-sync/releases"><img src="https://img.shields.io/github/v/release/shnulaa/lotus-docker-sync?include_prereleases" alt="最新版本"></a>
+  <a href="https://github.com/shnulaa/lotus-docker-sync/actions/workflows/build.yml"><img src="https://github.com/shnulaa/lotus-docker-sync/actions/workflows/build.yml/badge.svg" alt="构建状态"></a>
+  <a href="https://github.com/shnulaa/lotus-docker-sync/releases"><img src="https://img.shields.io/github/downloads/shnulaa/lotus-docker-sync/total" alt="下载量"></a>
+</p>
+
 一个 Docker Hub 镜像同步工具，自动将 Docker Hub 镜像同步到 GitHub Container Registry (GHCR)，解决国内访问 Docker Hub 困难的问题。
 
 ## 快速开始
