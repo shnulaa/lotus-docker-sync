@@ -44,28 +44,36 @@ impl GitHubAuth {
         // 1. 获取设备码
         let device_code_response = auth.get_device_code().await?;
         
-        // 2. 显示验证码并打开浏览器
+        // 2. 显示验证码
         println!();
-        println!("{}", "📋 Please complete the following steps:".yellow());
-        println!("1. Open your browser to: {}", device_code_response.verification_uri.cyan());
-        println!("2. Enter this code: {}", device_code_response.user_code.bright_green().bold());
-        println!("3. Authorize the application");
+        println!("{}", "📋 请完成以下步骤:".yellow());
+        println!("1. 在浏览器中打开: {}", device_code_response.verification_uri.cyan());
+        println!("2. 输入验证码: {}", device_code_response.user_code.bright_green().bold());
+        println!("3. 授权应用");
         println!();
         
-        // 打开浏览器
+        // 尝试打开浏览器（仅在桌面环境）
         #[cfg(windows)]
         {
             let _ = webbrowser::open(&device_code_response.verification_uri);
         }
         
-        #[cfg(not(windows))]
+        #[cfg(target_os = "macos")]
         {
             let _ = std::process::Command::new("open")
                 .arg(&device_code_response.verification_uri)
                 .spawn();
         }
         
-        println!("{}", "⏳ Waiting for authorization...".blue());
+        #[cfg(target_os = "linux")]
+        {
+            // Linux 上尝试 xdg-open，如果失败则忽略（服务器环境）
+            let _ = std::process::Command::new("xdg-open")
+                .arg(&device_code_response.verification_uri)
+                .spawn();
+        }
+        
+        println!("{}", "⏳ 等待授权...".blue());
         
         // 3. 轮询获取访问令牌
         let token = auth.poll_for_token(&device_code_response).await?;
