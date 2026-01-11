@@ -105,9 +105,6 @@ docker-sync auth status
 
 # 登出
 docker-sync auth logout
-
-# 删除已同步的镜像
-docker-sync delete nginx
 ```
 
 ## 工作原理

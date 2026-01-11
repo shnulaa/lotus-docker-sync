@@ -66,11 +66,6 @@ async fn main() -> Result<()> {
                         )
                 )
         )
-        .subcommand(
-            Command::new("delete")
-                .about("Delete a synced package from GHCR")
-                .arg(Arg::new("package").required(true).help("Package name to delete (e.g., nginx)"))
-        )
         .arg(Arg::new("image").help("Image name to pull (shorthand for 'pull' command)"));
 
     let matches = matches.try_get_matches();
@@ -85,9 +80,6 @@ async fn main() -> Result<()> {
                 handle_pull(image, quiet, verbose).await?;
             } else if let Some(auth_matches) = matches.subcommand_matches("auth") {
                 handle_auth(auth_matches).await?;
-            } else if let Some(delete_matches) = matches.subcommand_matches("delete") {
-                let package = delete_matches.get_one::<String>("package").unwrap();
-                handle_delete(package).await?;
             } else if let Some(image) = matches.get_one::<String>("image") {
                 // Shorthand: docker-sync nginx:latest
                 handle_pull(image, false, false).await?;
@@ -385,21 +377,3 @@ async fn handle_auth(matches: &clap::ArgMatches) -> Result<()> {
     }
 }
 
-
-async fn handle_delete(package: &str) -> Result<()> {
-    let config = Config::load().await?;
-    
-    if config.github_token.is_none() {
-        println!("{}", "🔐 需要先登录认证".yellow());
-        println!("{}", "运行 'docker-sync auth login' 进行 GitHub 认证".cyan());
-        return Ok(());
-    }
-
-    let mut github_client = GitHubClient::new(config.github_token.as_ref().unwrap());
-    let _ = github_client.get_username().await?;
-    
-    println!("{} 正在删除: {}", "🗑️".yellow(), package.cyan());
-    github_client.delete_package(package).await?;
-    
-    Ok(())
-}
