@@ -34,12 +34,17 @@ pub struct GitHubAuth {
 impl GitHubAuth {
     pub fn new() -> Self {
         Self {
-            client: Client::new(),
+            client: Client::builder()
+                .timeout(Duration::from_secs(30))
+                .build()
+                .unwrap_or_else(|_| Client::new()),
         }
     }
     
     pub async fn login_with_browser() -> Result<String> {
         let auth = Self::new();
+        
+        println!("{}", "正在连接 GitHub...".blue());
         
         // 1. 获取设备码
         let device_code_response = auth.get_device_code().await?;
