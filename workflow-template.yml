@@ -1,0 +1,71 @@
+name: Docker Image Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      docker_images:
+        description: 'Docker Hub image (e.g., nginx:alpine)'
+        required: true
+        type: string
+
+env:
+  REGISTRY_GHCR: ghcr.io
+
+jobs:
+  sync-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY_GHCR }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Sync image
+      run: |
+        IMAGE_INPUT="${{ github.event.inputs.docker_images }}"
+        USERNAME="${{ github.repository_owner }}"
+        
+        # 解析镜像名和标签
+        if [[ "$IMAGE_INPUT" == *":"* ]]; then
+          IMAGE_NAME=$(echo "$IMAGE_INPUT" | cut -d':' -f1)
+          IMAGE_TAG=$(echo "$IMAGE_INPUT" | cut -d':' -f2)
+        else
+          IMAGE_NAME="$IMAGE_INPUT"
+          IMAGE_TAG="latest"
+        fi
+        
+        # 处理官方镜像
+        if [[ "$IMAGE_NAME" != *"/"* ]]; then
+          TARGET_NAME="$IMAGE_NAME"
+        else
+          TARGET_NAME="$IMAGE_NAME"
+        fi
+        
+        GHCR_IMAGE="${{ env.REGISTRY_GHCR }}/${USERNAME}/${TARGET_NAME}:${IMAGE_TAG}"
+        
+        echo "Pulling image: $IMAGE_INPUT"
+        docker pull "$IMAGE_INPUT"
+        
+        echo "Tagging image: $GHCR_IMAGE"
+        docker tag "$IMAGE_INPUT" "$GHCR_IMAGE"
+        
+        echo "Pushing image: $GHCR_IMAGE"
+        docker push "$GHCR_IMAGE"
+        
+        echo "✅ Successfully synced $IMAGE_INPUT to $GHCR_IMAGE"
+        echo ""
+        echo "You can now pull this image using:"
+        echo "  docker pull $GHCR_IMAGE"
+        echo "  docker pull ghcr.nju.edu.cn/${USERNAME}/${TARGET_NAME}:${IMAGE_TAG}"
