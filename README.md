@@ -6,7 +6,7 @@
   <a href="https://github.com/shnulaa/lotus-docker-sync/releases"><img src="https://img.shields.io/github/downloads/shnulaa/lotus-docker-sync/total" alt="下载量"></a>
 </p>
 
-一个 Docker Hub 镜像同步工具，自动将 Docker Hub 镜像同步到 GitHub Container Registry (GHCR)，解决国内访问 Docker Hub 困难的问题。国内加速：使用 ghcr.nju.edu.cn 镜像源 
+一个 Docker Hub 镜像同步工具，自动将 Docker Hub 镜像同步到 GitHub Container Registry (GHCR)，解决国内访问 Docker Hub 困难的问题。GitHub Container Registry 国内加速：使用 ghcr.nju.edu.cn 镜像源 
 
 ## 快速开始
 
