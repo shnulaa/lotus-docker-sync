@@ -71,9 +71,6 @@ docker-sync auth login
 docker-sync nginx:alpine
 
 # 批量同步多个镜像
-docker-sync nginx:alpine redis:7 mysql:8.0
-
-# 完整命令
 docker-sync pull nginx:alpine redis:7 mysql:8.0
 ```
 
