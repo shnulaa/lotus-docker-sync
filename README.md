@@ -150,6 +150,14 @@ docker-sync auth login
 
 如果本地未安装 Docker，同步完成后会提示手动拉取命令。
 
+## 支持项目
+
+如果这个工具对你有帮助，请：
+
+- ⭐ 给项目点个 Star
+- 🐛 遇到问题请提 [Issue](https://github.com/shnulaa/lotus-docker-sync/issues)
+- 💡 有建议或想法也欢迎讨论
+
 ## 免责声明
 
 本工具仅供学习和个人开发使用。使用本工具时请注意：
