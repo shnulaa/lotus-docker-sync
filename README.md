@@ -6,7 +6,7 @@
   <a href="https://github.com/shnulaa/lotus-docker-sync/releases"><img src="https://img.shields.io/github/downloads/shnulaa/lotus-docker-sync/total" alt="下载量"></a>
 </p>
 
-一个 Docker Hub 镜像同步工具，自动将 Docker Hub 镜像同步到 GitHub Container Registry (GHCR)，解决国内访问 Docker Hub 困难的问题。
+一个 Docker Hub 镜像同步工具，用于将 Docker Hub 上的镜像同步至 GitHub Container Registry（GHCR），提升在复杂网络环境下的镜像获取稳定性与使用体验。
 
 ## ✨ 核心亮点
 
@@ -177,14 +177,14 @@ docker-sync auth login
 - 💡 有建议或想法也欢迎讨论
 
 ## 免责声明
-
-本工具仅供学习和个人开发使用。使用本工具时请注意：
-
-- 仅同步公开的开源镜像，不要同步商业或私有镜像
-- 请遵守 Docker Hub、GitHub 及相关服务的使用条款
-- 请遵守镜像内软件的开源许可证
-- 本工具不提供任何担保，使用风险自负
-- 请遵守当地法律法规
+- 本项目为技术学习与个人开发用途的自动化工具。使用本项目即表示您已理解并同意以下条款：
+- 本工具仅用于同步公开可访问且具有合法再分发许可的 Docker 镜像
+- 使用者应自行确认镜像及其包含软件的许可证与使用条件
+- 禁止同步商业授权镜像、私有镜像、破解镜像或其他未经授权内容
+- 使用过程中应遵守 Docker Hub、GitHub、GitHub Container Registry 及相关服务条款
+- 本项目不对镜像内容的合法性、可用性或适用性作出任何保证
+- 因使用本工具产生的风险或法律责任由使用者自行承担
+- 使用者应遵守所在国家或地区的相关法律法规
 
 ## 许可证
 
