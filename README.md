@@ -6,7 +6,15 @@
   <a href="https://github.com/shnulaa/lotus-docker-sync/releases"><img src="https://img.shields.io/github/downloads/shnulaa/lotus-docker-sync/total" alt="下载量"></a>
 </p>
 
-一个 Docker Hub 镜像同步工具，自动将 Docker Hub 镜像同步到 GitHub Container Registry (GHCR)，解决国内访问 Docker Hub 困难的问题。GitHub Container Registry 国内加速：使用 ghcr.nju.edu.cn 镜像源 
+一个 Docker Hub 镜像同步工具，自动将 Docker Hub 镜像同步到 GitHub Container Registry (GHCR)，解决国内访问 Docker Hub 困难的问题。
+
+## ✨ 核心亮点
+
+- 🏠 **创建专属镜像库**：在你的 GitHub 账号下自动创建私有镜像仓库
+- 🚀 **一键同步**：自动将 Docker Hub 镜像同步到你的 GHCR
+- 🇨🇳 **国内加速访问**：使用 `ghcr.nju.edu.cn` 镜像源，告别龟速下载
+- 🔐 **完全私有**：所有镜像存储在你的 GitHub 账号下，安全可控
+- ⚡ **智能管理**：自动更新镜像版本，无需手动维护GitHub Container Registry 国内加速：使用 ghcr.nju.edu.cn 镜像源 
 
 ## 快速开始
 
@@ -72,21 +80,24 @@ docker-sync mysql:8.0
 同步完成后，可以通过以下方式拉取镜像：
 
 ```bash
-# 国内加速（推荐）
+# 国内加速（推荐）- 从你的专属镜像库拉取
 docker pull ghcr.nju.edu.cn/你的用户名/nginx:alpine
 
-# 或直接从 GHCR
+# 或直接从你的 GHCR 私有库
 docker pull ghcr.io/你的用户名/nginx:alpine
 ```
+
+🎉 **恭喜！你现在拥有了自己的 Docker 镜像私有库！**
 
 ## 功能特性
 
 - 🔐 **OAuth 登录**：无需手动创建 Token，浏览器授权即可
-- 🔄 **自动同步**：自动触发 GitHub Action 同步镜像
+- 🏗️ **自动建库**：首次使用自动在你的 GitHub 创建专属镜像仓库
+- � **自动同步***：自动触发 GitHub Action 同步镜像
 - 📊 **实时进度**：显示同步步骤和进度
 - 🇨🇳 **国内加速**：使用 `ghcr.nju.edu.cn` 镜像源
 - 🗑️ **智能更新**：自动删除旧版本，同步最新镜像
-- ⚡ **首次自动配置**：自动创建仓库和 GitHub Action
+- ⚡ **零配置**：一键登录，立即使用
 
 ## 命令说明
 
@@ -109,9 +120,12 @@ docker-sync auth logout
 
 ## 工作原理
 
-1. **首次使用**：自动在你的 GitHub 账号下创建 `docker-sync` 仓库
-2. **触发同步**：通过 GitHub Action 从 Docker Hub 拉取镜像并推送到 GHCR
-3. **国内访问**：使用南京大学镜像 `ghcr.nju.edu.cn` 加速访问
+1. **创建专属仓库**：首次使用时在你的 GitHub 账号下创建 `docker-sync` 仓库
+2. **自动化同步**：通过 GitHub Action 从 Docker Hub 拉取镜像并推送到你的 GHCR
+3. **私有镜像库**：所有镜像存储在 `ghcr.io/你的用户名/` 下，完全私有
+4. **国内加速**：使用南京大学镜像 `ghcr.nju.edu.cn` 加速访问
+
+💡 **相当于拥有了自己的 Docker Hub 私有镜像站！**
 
 ## 示例输出
 
