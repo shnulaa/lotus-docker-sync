@@ -135,6 +135,7 @@ async fn handle_pull(image: &str, quiet: bool, verbose: bool) -> Result<()> {
 
     if !quiet {
         println!("{} 启动 GitHub Action 同步...", "🚀".bright_blue());
+        println!("{} 注意：大镜像同步时间较长，请耐心等待", "💡".yellow());
     }
 
     // Trigger GitHub Action
