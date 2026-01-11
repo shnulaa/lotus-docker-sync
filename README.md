@@ -60,7 +60,7 @@ Invoke-WebRequest -Uri "https://github.com/shnulaa/lotus-docker-sync/releases/la
 ### 2. 登录 GitHub
 
 ```bash
-# 首次使用需要登录（会自动打开浏览器）
+# 首次使用需要登录（windows会自动打开浏览器， linux控制台引导）
 docker-sync auth login
 ```
 
@@ -106,10 +106,7 @@ docker pull ghcr.io/你的用户名/nginx:alpine
 docker-sync nginx:alpine
 
 # 批量同步多个镜像
-docker-sync nginx:alpine redis:7 mysql:8.0
-
-# 同步镜像（完整命令）
-docker-sync pull nginx:alpine
+docker-sync pull nginx:alpine redis:7 mysql:8.0
 
 # 登录
 docker-sync auth login
