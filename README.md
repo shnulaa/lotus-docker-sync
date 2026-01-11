@@ -12,9 +12,10 @@
 
 - 🏠 **创建专属镜像库**：在你的 GitHub 账号下自动创建私有镜像仓库
 - 🚀 **一键同步**：自动将 Docker Hub 镜像同步到你的 GHCR
+- 📦 **批量同步**：支持一次性同步多个镜像
 - 🌐 **访问优化**：支持通过 ghcr.nju.edu.cn 等镜像服务提升拉取体验
 - 🔐 **完全私有**：所有镜像存储在你的 GitHub 账号下，安全可控
-- ⚡ **智能管理**：自动更新镜像版本，无需手动维护GitHub Container 
+- ⚡ **智能管理**：自动更新镜像版本，无需手动维护GitHub Container
 - 注：具体访问速度与可用性取决于网络环境及第三方镜像服务状态。
 
 ## 快速开始
@@ -66,14 +67,14 @@ docker-sync auth login
 ### 3. 同步镜像
 
 ```bash
-# 同步 nginx
+# 同步单个镜像
 docker-sync nginx:alpine
 
-# 同步 redis
-docker-sync redis:7-alpine
+# 批量同步多个镜像
+docker-sync nginx:alpine redis:7 mysql:8.0
 
-# 同步 mysql
-docker-sync mysql:8.0
+# 完整命令
+docker-sync pull nginx:alpine redis:7 mysql:8.0
 ```
 
 ### 4. 使用镜像
@@ -94,7 +95,8 @@ docker pull ghcr.io/你的用户名/nginx:alpine
 
 - 🔐 **OAuth 登录**：无需手动创建 Token，浏览器授权即可
 - 🏗️ **自动建库**：首次使用自动在你的 GitHub 创建专属镜像仓库
-- � **自动同步***：自动触发 GitHub Action 同步镜像
+- 🚀 **自动同步**：自动触发 GitHub Action 同步镜像
+- 📦 **批量同步**：支持一次性同步多个镜像
 - 📊 **实时进度**：显示同步步骤和进度
 - 🇨🇳 **国内加速**：使用 `ghcr.nju.edu.cn` 镜像源
 - 🗑️ **智能更新**：自动删除旧版本，同步最新镜像
@@ -103,10 +105,13 @@ docker pull ghcr.io/你的用户名/nginx:alpine
 ## 命令说明
 
 ```bash
-# 同步镜像（简写）
+# 同步单个镜像（简写）
 docker-sync nginx:alpine
 
-# 同步镜像（完整）
+# 批量同步多个镜像
+docker-sync nginx:alpine redis:7 mysql:8.0
+
+# 同步镜像（完整命令）
 docker-sync pull nginx:alpine
 
 # 登录
@@ -130,6 +135,8 @@ docker-sync auth logout
 
 ## 示例输出
 
+### 单个镜像同步
+
 ```
 $ docker-sync nginx:alpine
 
@@ -141,8 +148,40 @@ $ docker-sync nginx:alpine
   ✓ Set up Docker Buildx
   ✓ Log in to GitHub Container Registry
   ✓ Sync image
-✅ 同步成功！
-🎉 同步完成！正在从 ghcr.nju.edu.cn/shnulaa/nginx:alpine 拉取镜像...
+  ✅ 同步成功！
+  🎉 同步完成！正在从 ghcr.nju.edu.cn/shnulaa/nginx:alpine 拉取镜像...
+```
+
+### 批量同步
+
+```
+$ docker-sync nginx:alpine redis:7 mysql:8.0
+
+📦 准备同步 3 个镜像...
+
+▶ [1/3] 处理镜像: nginx:alpine
+🔍 检查镜像 ghcr.nju.edu.cn/shnulaa/nginx:alpine
+🚀 启动 GitHub Action 同步...
+📋 工作流已启动，ID: 1234567890
+  ✓ Sync image
+  ✅ 同步成功！
+  🎉 同步完成！正在从 ghcr.nju.edu.cn/shnulaa/nginx:alpine 拉取镜像...
+
+▶ [2/3] 处理镜像: redis:7
+🔍 检查镜像 ghcr.nju.edu.cn/shnulaa/redis:7
+🚀 启动 GitHub Action 同步...
+📋 工作流已启动，ID: 1234567891
+  ✓ Sync image
+  ✅ 同步成功！
+
+▶ [3/3] 处理镜像: mysql:8.0
+🔍 检查镜像 ghcr.nju.edu.cn/shnulaa/mysql:8.0
+🚀 启动 GitHub Action 同步...
+📋 工作流已启动，ID: 1234567892
+  ✓ Sync image
+  ✅ 同步成功！
+
+🎉 全部 3 个镜像同步完成！
 ```
 
 ## 配置文件
