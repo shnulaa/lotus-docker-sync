@@ -67,10 +67,7 @@ impl GitHubAuth {
         
         #[cfg(target_os = "linux")]
         {
-            // Linux 上尝试 xdg-open，如果失败则忽略（服务器环境）
-            let _ = std::process::Command::new("xdg-open")
-                .arg(&device_code_response.verification_uri)
-                .spawn();
+            // Linux 服务器环境不自动打开浏览器，用户手动在本地浏览器打开
         }
         
         println!("{}", "⏳ 等待授权...".blue());
