@@ -58,7 +58,7 @@ sudo mv docker-sync /usr/local/bin/
 Invoke-WebRequest -Uri "https://github.com/shnulaa/lotus-docker-sync/releases/latest/download/docker-sync-windows-amd64.exe" -OutFile "docker-sync.exe"
 
 # 访问困难使用
-Invoke-WebRequest -Uri "https://git.yylx.win/https://github.com/shnulaa/lotus-docker-sync/releases/download/v1.0.5/docker-sync-linux-amd64" -OutFile "docker-sync.exe"
+Invoke-WebRequest -Uri "https://git.yylx.win/https://github.com/shnulaa/lotus-docker-sync/releases/latest/download/docker-sync-windows-amd64.exe" -OutFile "docker-sync.exe"
 
 # 运行
 .\docker-sync.exe --help
