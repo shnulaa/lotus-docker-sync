@@ -8,6 +8,9 @@ pub struct Config {
     pub github_token: Option<String>,
     pub ghcr_registry: String,
     pub nju_registry: String,
+    pub default_registry: String,
+    pub custom_registries: Vec<String>,
+    pub proxy: Option<String>,
 }
 
 impl Config {
@@ -42,6 +45,15 @@ impl Config {
         path.push("config.json");
         Ok(path)
     }
+    
+    pub fn get_all_registries(&self) -> Vec<String> {
+        let mut registries = vec![
+            self.nju_registry.clone(),
+            self.ghcr_registry.clone(),
+        ];
+        registries.extend(self.custom_registries.clone());
+        registries
+    }
 }
 
 impl Default for Config {
@@ -50,6 +62,9 @@ impl Default for Config {
             github_token: None,
             ghcr_registry: "ghcr.io".to_string(),
             nju_registry: "ghcr.nju.edu.cn".to_string(),
+            default_registry: "ghcr.nju.edu.cn".to_string(),
+            custom_registries: vec![],
+            proxy: None,
         }
     }
 }

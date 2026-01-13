@@ -115,14 +115,16 @@ docker-sync nginx:alpine
 # 批量同步多个镜像
 docker-sync pull nginx:alpine redis:7 mysql:8.0
 
-# 登录
-docker-sync auth login
+# 认证管理
+docker-sync auth login      # OAuth 登录
+docker-sync auth status     # 查看登录状态
+docker-sync auth logout     # 登出
 
-# 查看登录状态
-docker-sync auth status
-
-# 登出
-docker-sync auth logout
+# 配置管理（代理设置）
+docker-sync config set-proxy http://127.0.0.1:7890    # 设置 HTTP 代理
+docker-sync config set-proxy socks5://127.0.0.1:1080  # 设置 SOCKS5 代理
+docker-sync config clear-proxy                         # 清除代理
+docker-sync config show                                # 显示配置
 ```
 
 ## 工作原理
@@ -204,6 +206,24 @@ docker-sync auth login
 ### 未安装 Docker
 
 如果本地未安装 Docker，同步完成后会提示手动拉取命令。
+
+### 代理设置
+
+如果访问 GitHub API 困难，可以设置代理：
+
+```bash
+# 设置 HTTP 代理
+docker-sync config set-proxy http://127.0.0.1:7890
+
+# 设置 SOCKS5 代理  
+docker-sync config set-proxy socks5://127.0.0.1:1080
+
+# 清除代理设置
+docker-sync config clear-proxy
+
+# 查看当前配置（包括代理设置）
+docker-sync config show
+```
 
 ### 大镜像同步时间长
 

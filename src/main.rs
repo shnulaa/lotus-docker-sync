@@ -59,6 +59,27 @@ async fn main() -> Result<()> {
                         ),
                 ),
         )
+        .subcommand(
+            Command::new("config")
+                .about("Configuration management")
+                .subcommand(
+                    Command::new("set-proxy")
+                        .about("Set proxy for GitHub API access")
+                        .arg(
+                            Arg::new("proxy")
+                                .required(true)
+                                .help("Proxy URL (e.g., http://127.0.0.1:7890, socks5://127.0.0.1:1080)")
+                        )
+                )
+                .subcommand(
+                    Command::new("clear-proxy")
+                        .about("Clear proxy settings")
+                )
+                .subcommand(
+                    Command::new("show")
+                        .about("Show current configuration")
+                )
+        )
         .arg(Arg::new("image").help("Image name to pull (shorthand for 'pull' command)"));
 
     let matches = matches.try_get_matches();
@@ -73,12 +94,35 @@ async fn main() -> Result<()> {
                 handle_pull(images, quiet, verbose).await?;
             } else if let Some(auth_matches) = matches.subcommand_matches("auth") {
                 handle_auth(auth_matches).await?;
+            } else if let Some(config_matches) = matches.subcommand_matches("config") {
+                handle_config(config_matches).await?;
             } else if let Some(image) = matches.get_one::<String>("image") {
                 // Shorthand: docker-sync nginx:latest
                 handle_pull(vec![image], false, false).await?;
             } else {
                 // Show help if no arguments
-                println!("Use 'docker-sync --help' for usage information");
+                println!("Docker Sync - Docker Hub 镜像同步工具");
+                println!();
+                println!("使用方法:");
+                println!("  docker-sync <镜像名>                    同步单个镜像");
+                println!("  docker-sync pull <镜像1> <镜像2> ...    批量同步镜像");
+                println!();
+                println!("认证管理:");
+                println!("  docker-sync auth login                  GitHub OAuth 登录");
+                println!("  docker-sync auth status                 查看登录状态");
+                println!("  docker-sync auth logout                 登出");
+                println!();
+                println!("配置管理:");
+                println!("  docker-sync config set-proxy <URL>     设置代理");
+                println!("  docker-sync config clear-proxy         清除代理");
+                println!("  docker-sync config show                显示配置");
+                println!();
+                println!("示例:");
+                println!("  docker-sync nginx:alpine               同步 nginx:alpine");
+                println!("  docker-sync pull redis:7 mysql:8.0     批量同步");
+                println!("  docker-sync config set-proxy http://127.0.0.1:7890");
+                println!();
+                println!("更多帮助: docker-sync --help");
             }
         }
         Err(e) => {
@@ -102,7 +146,10 @@ async fn handle_pull(images: Vec<&String>, quiet: bool, verbose: bool) -> Result
         return Ok(());
     }
 
-    let mut github_client = GitHubClient::new(config.github_token.as_ref().unwrap());
+    let mut github_client = GitHubClient::new_with_proxy(
+        config.github_token.as_ref().unwrap(),
+        config.proxy.as_deref()
+    );
     let username = github_client.get_username().await?;
 
     if images.len() > 1 && !quiet {
@@ -409,6 +456,55 @@ async fn handle_auth(matches: &clap::ArgMatches) -> Result<()> {
             println!("  logout  - Clear stored authentication");
             println!("  status  - Show authentication status");
             println!("  token   - Set token manually");
+            Ok(())
+        }
+    }
+}
+
+async fn handle_config(matches: &clap::ArgMatches) -> Result<()> {
+    match matches.subcommand() {
+        Some(("set-proxy", sub_matches)) => {
+            let proxy = sub_matches.get_one::<String>("proxy").unwrap();
+            
+            let mut config = Config::load().await.unwrap_or_default();
+            config.proxy = Some(proxy.clone());
+            config.save().await?;
+            
+            println!("{} 代理已设置为: {}", "✅".green(), proxy.cyan());
+            Ok(())
+        }
+        Some(("clear-proxy", _)) => {
+            let mut config = Config::load().await.unwrap_or_default();
+            config.proxy = None;
+            config.save().await?;
+            
+            println!("{} 代理设置已清除", "✅".green());
+            Ok(())
+        }
+        Some(("show", _)) => {
+            let config = Config::load().await.unwrap_or_default();
+            
+            println!("{}", "📋 当前配置:".blue());
+            println!("  认证状态: {}", if config.github_token.is_some() { "已登录".green() } else { "未登录".red() });
+            println!("  默认镜像源: {}", config.default_registry.cyan());
+            println!("  代理设置: {}", 
+                if let Some(proxy) = &config.proxy { 
+                    proxy.cyan() 
+                } else { 
+                    "未设置".dimmed() 
+                }
+            );
+            Ok(())
+        }
+        _ => {
+            println!("可用的配置命令:");
+            println!("  set-proxy <URL>  - 设置代理 (支持 http:// 和 socks5://)");
+            println!("  clear-proxy      - 清除代理设置");
+            println!("  show             - 显示当前配置");
+            println!();
+            println!("代理示例:");
+            println!("  docker-sync config set-proxy http://127.0.0.1:7890");
+            println!("  docker-sync config set-proxy socks5://127.0.0.1:1080");
             Ok(())
         }
     }

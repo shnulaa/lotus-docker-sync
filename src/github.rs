@@ -47,6 +47,22 @@ impl GitHubClient {
         }
     }
     
+    pub fn new_with_proxy(token: &str, proxy: Option<&str>) -> Self {
+        let mut builder = Client::builder();
+        
+        if let Some(proxy_url) = proxy {
+            if let Ok(proxy) = reqwest::Proxy::all(proxy_url) {
+                builder = builder.proxy(proxy);
+            }
+        }
+        
+        Self {
+            client: builder.build().unwrap_or_else(|_| Client::new()),
+            token: token.to_string(),
+            username: None,
+        }
+    }
+    
     pub async fn get_username(&mut self) -> Result<String> {
         if let Some(ref username) = self.username {
             return Ok(username.clone());

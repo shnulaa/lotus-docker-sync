@@ -40,9 +40,25 @@ impl GitHubAuth {
                 .unwrap_or_else(|_| Client::new()),
         }
     }
+    
+    pub fn new_with_proxy(proxy: Option<&str>) -> Self {
+        let mut builder = Client::builder().timeout(Duration::from_secs(30));
+        
+        if let Some(proxy_url) = proxy {
+            if let Ok(proxy) = reqwest::Proxy::all(proxy_url) {
+                builder = builder.proxy(proxy);
+            }
+        }
+        
+        Self {
+            client: builder.build().unwrap_or_else(|_| Client::new()),
+        }
+    }
 
     pub async fn login_with_browser() -> Result<String> {
-        let auth = Self::new();
+        use crate::config::Config;
+        let config = Config::load().await.unwrap_or_default();
+        let auth = Self::new_with_proxy(config.proxy.as_deref());
 
         println!("{}", "正在连接 GitHub...".blue());
 
