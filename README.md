@@ -36,6 +36,9 @@
 ```bash
 # 下载最新版本
 curl -L -o docker-sync https://github.com/shnulaa/lotus-docker-sync/releases/latest/download/docker-sync-linux-amd64
+# 访问困难使用
+curl -L -o docker-sync https://git.yylx.win/https://github.com/shnulaa/lotus-docker-sync/releases/download/v1.0.5/docker-sync-linux-amd64
+
 
 # 添加执行权限
 chmod +x docker-sync
@@ -52,6 +55,9 @@ sudo mv docker-sync /usr/local/bin/
 ```powershell
 # 下载到当前目录
 Invoke-WebRequest -Uri "https://github.com/shnulaa/lotus-docker-sync/releases/latest/download/docker-sync-windows-amd64.exe" -OutFile "docker-sync.exe"
+
+# 访问困难使用
+Invoke-WebRequest -Uri "https://git.yylx.win/https://github.com/shnulaa/lotus-docker-sync/releases/download/v1.0.5/docker-sync-linux-amd64" -OutFile "docker-sync.exe"
 
 # 运行
 .\docker-sync.exe --help
