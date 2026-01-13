@@ -51,13 +51,26 @@ impl GitHubClient {
         let mut builder = Client::builder();
         
         if let Some(proxy_url) = proxy {
-            if let Ok(proxy) = reqwest::Proxy::all(proxy_url) {
-                builder = builder.proxy(proxy);
+            match reqwest::Proxy::all(proxy_url) {
+                Ok(proxy) => {
+                    println!("{} 使用代理: {}", "🌐".blue(), proxy_url.cyan());
+                    builder = builder.proxy(proxy);
+                }
+                Err(e) => {
+                    println!("{} 代理配置错误: {} - {}", "⚠️".yellow(), proxy_url, e);
+                    println!("{} 将使用直连方式", "📡".yellow());
+                }
             }
         }
         
         Self {
-            client: builder.build().unwrap_or_else(|_| Client::new()),
+            client: match builder.build() {
+                Ok(client) => client,
+                Err(e) => {
+                    println!("{} 客户端创建失败: {}", "❌".red(), e);
+                    Client::new()
+                }
+            },
             token: token.to_string(),
             username: None,
         }

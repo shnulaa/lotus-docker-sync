@@ -101,6 +101,7 @@ docker-sync config set-proxy http://127.0.0.1:7890    # 设置 HTTP 代理
 docker-sync config set-proxy socks5://127.0.0.1:1080  # 设置 SOCKS5 代理
 docker-sync config clear-proxy                         # 清除代理
 docker-sync config show                                # 显示配置
+docker-sync config test-proxy                          # 测试代理连接
 ```
 
 ### 4. 使用镜像
@@ -211,7 +212,7 @@ docker-sync auth login
 
 ### 代理设置
 
-如果访问 GitHub API 困难，可以设置代理：
+如果不能直接访问 GitHub API，可以设置代理：
 
 ```bash
 # 设置 HTTP 代理
@@ -220,11 +221,26 @@ docker-sync config set-proxy http://127.0.0.1:7890
 # 设置 SOCKS5 代理  
 docker-sync config set-proxy socks5://127.0.0.1:1080
 
+# 测试代理连接
+docker-sync config test-proxy
+
 # 清除代理设置
 docker-sync config clear-proxy
 
 # 查看当前配置（包括代理设置）
 docker-sync config show
+```
+
+**代理测试示例输出：**
+```
+🔍 测试代理连接: http://127.0.0.1:7890
+⏳ 正在测试代理连接...
+🌐 检测到 HTTP 代理
+✓ 代理配置解析成功
+✓ HTTP 客户端创建成功
+🔍 测试连接到 GitHub API...
+✓ GitHub API 响应: 403 Forbidden
+🎉 代理连接正常！(403 是预期响应，因为未提供认证)
 ```
 
 ### 大镜像同步时间长

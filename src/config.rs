@@ -46,6 +46,7 @@ impl Config {
         Ok(path)
     }
     
+    #[allow(dead_code)]
     pub fn get_all_registries(&self) -> Vec<String> {
         let mut registries = vec![
             self.nju_registry.clone(),

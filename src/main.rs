@@ -79,6 +79,10 @@ async fn main() -> Result<()> {
                     Command::new("show")
                         .about("Show current configuration")
                 )
+                .subcommand(
+                    Command::new("test-proxy")
+                        .about("Test proxy connection to GitHub API")
+                )
         )
         .arg(Arg::new("image").help("Image name to pull (shorthand for 'pull' command)"));
 
@@ -115,6 +119,7 @@ async fn main() -> Result<()> {
                 println!("配置管理:");
                 println!("  docker-sync config set-proxy <URL>     设置代理");
                 println!("  docker-sync config clear-proxy         清除代理");
+                println!("  docker-sync config test-proxy          测试代理连接");
                 println!("  docker-sync config show                显示配置");
                 println!();
                 println!("示例:");
@@ -496,11 +501,23 @@ async fn handle_config(matches: &clap::ArgMatches) -> Result<()> {
             );
             Ok(())
         }
+        Some(("test-proxy", _)) => {
+            let config = Config::load().await.unwrap_or_default();
+            
+            if let Some(proxy) = &config.proxy {
+                println!("{} 测试代理连接: {}", "🔍".blue(), proxy.cyan());
+                test_proxy_connection(proxy).await?;
+            } else {
+                println!("{} 未设置代理", "⚠️".yellow());
+            }
+            Ok(())
+        }
         _ => {
             println!("可用的配置命令:");
             println!("  set-proxy <URL>  - 设置代理 (支持 http:// 和 socks5://)");
             println!("  clear-proxy      - 清除代理设置");
             println!("  show             - 显示当前配置");
+            println!("  test-proxy       - 测试代理连接");
             println!();
             println!("代理示例:");
             println!("  docker-sync config set-proxy http://127.0.0.1:7890");
@@ -508,4 +525,98 @@ async fn handle_config(matches: &clap::ArgMatches) -> Result<()> {
             Ok(())
         }
     }
+}
+async fn test_proxy_connection(proxy_url: &str) -> Result<()> {
+    use reqwest::Client;
+    use std::time::Duration;
+    
+    println!("{} 正在测试代理连接...", "⏳".yellow());
+    
+    // 检测代理类型
+    if proxy_url.starts_with("http://") {
+        println!("{} 检测到 HTTP 代理", "🌐".blue());
+    } else if proxy_url.starts_with("socks5://") {
+        println!("{} 检测到 SOCKS5 代理", "🌐".blue());
+    } else {
+        println!("{} 未知代理协议", "⚠️".yellow());
+    }
+    
+    // 创建代理配置
+    let client = match reqwest::Proxy::all(proxy_url) {
+        Ok(proxy) => {
+            println!("{} 代理配置解析成功", "✓".green());
+            match Client::builder()
+                .proxy(proxy)
+                .timeout(Duration::from_secs(10))
+                .build() 
+            {
+                Ok(client) => {
+                    println!("{} HTTP 客户端创建成功", "✓".green());
+                    client
+                }
+                Err(e) => {
+                    println!("{} HTTP 客户端创建失败: {}", "❌".red(), e);
+                    return Err(anyhow!("客户端创建失败"));
+                }
+            }
+        }
+        Err(e) => {
+            println!("{} 代理配置解析失败: {}", "❌".red(), e);
+            return Err(anyhow!("代理配置无效"));
+        }
+    };
+    
+    // 测试连接到 GitHub API
+    println!("{} 测试连接到 GitHub API...", "🔍".blue());
+    
+    match client
+        .get("https://api.github.com")
+        .header("User-Agent", "docker-sync-cli-test")
+        .send()
+        .await 
+    {
+        Ok(response) => {
+            let status = response.status();
+            println!("{} GitHub API 响应: {}", "✓".green(), status);
+            
+            if status.is_success() {
+                println!("{} 代理连接测试成功！", "🎉".green());
+                
+                // 显示响应头信息
+                if let Some(server) = response.headers().get("server") {
+                    println!("  服务器: {:?}", server);
+                }
+            } else if status == 403 {
+                println!("{} 代理连接正常！(403 是预期响应，因为未提供认证)", "🎉".green());
+                println!("  这表明代理服务器工作正常，可以访问 GitHub API");
+            } else {
+                println!("{} API 返回状态码: {} (可能正常)", "⚠️".yellow(), status);
+                println!("  代理连接本身是成功的");
+            }
+        }
+        Err(e) => {
+            println!("{} 连接失败: {}", "❌".red(), e);
+            
+            // 提供诊断建议
+            let error_msg = e.to_string();
+            if error_msg.contains("timeout") {
+                println!("{} 可能原因: 代理服务器响应超时", "💡".yellow());
+                println!("  建议: 检查代理服务器是否正常运行");
+            } else if error_msg.contains("connection") || error_msg.contains("refused") {
+                println!("{} 可能原因: 无法连接到代理服务器", "💡".yellow());
+                println!("  建议: 检查代理地址和端口是否正确");
+            } else if error_msg.contains("socks") {
+                println!("{} 可能原因: SOCKS5 代理配置问题", "💡".yellow());
+                println!("  建议: 尝试使用 HTTP 代理格式 (http://{})", 
+                    proxy_url.strip_prefix("socks5://").unwrap_or(proxy_url));
+            } else if error_msg.contains("dns") {
+                println!("{} 可能原因: DNS 解析失败", "💡".yellow());
+                println!("  建议: 检查网络连接或使用 IP 地址");
+            }
+            
+            return Err(anyhow!("代理连接测试失败"));
+        }
+    }
+    
+    Ok(())
 }
