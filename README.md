@@ -81,6 +81,28 @@ docker-sync nginx:alpine
 docker-sync pull nginx:alpine redis:7 mysql:8.0
 ```
 
+
+## 命令说明
+
+```bash
+# 同步单个镜像（简写）
+docker-sync nginx:alpine
+
+# 批量同步多个镜像
+docker-sync pull nginx:alpine redis:7 mysql:8.0
+
+# 认证管理
+docker-sync auth login      # OAuth 登录
+docker-sync auth status     # 查看登录状态
+docker-sync auth logout     # 登出
+
+# 配置管理（代理设置）
+docker-sync config set-proxy http://127.0.0.1:7890    # 设置 HTTP 代理
+docker-sync config set-proxy socks5://127.0.0.1:1080  # 设置 SOCKS5 代理
+docker-sync config clear-proxy                         # 清除代理
+docker-sync config show                                # 显示配置
+```
+
 ### 4. 使用镜像
 
 同步完成后，可以通过以下方式拉取镜像：
@@ -106,26 +128,6 @@ docker pull ghcr.io/你的用户名/nginx:alpine
 - 🗑️ **智能更新**：自动删除旧版本，同步最新镜像
 - ⚡ **零配置**：一键登录，立即使用
 
-## 命令说明
-
-```bash
-# 同步单个镜像（简写）
-docker-sync nginx:alpine
-
-# 批量同步多个镜像
-docker-sync pull nginx:alpine redis:7 mysql:8.0
-
-# 认证管理
-docker-sync auth login      # OAuth 登录
-docker-sync auth status     # 查看登录状态
-docker-sync auth logout     # 登出
-
-# 配置管理（代理设置）
-docker-sync config set-proxy http://127.0.0.1:7890    # 设置 HTTP 代理
-docker-sync config set-proxy socks5://127.0.0.1:1080  # 设置 SOCKS5 代理
-docker-sync config clear-proxy                         # 清除代理
-docker-sync config show                                # 显示配置
-```
 
 ## 工作原理
 
