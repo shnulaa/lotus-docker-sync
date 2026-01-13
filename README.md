@@ -97,11 +97,13 @@ docker-sync auth status     # 查看登录状态
 docker-sync auth logout     # 登出
 
 # 配置管理（代理设置）
-docker-sync config set-proxy http://127.0.0.1:7890    # 设置 HTTP 代理
-docker-sync config set-proxy socks5://127.0.0.1:1080  # 设置 SOCKS5 代理
-docker-sync config clear-proxy                         # 清除代理
-docker-sync config show                                # 显示配置
-docker-sync config test-proxy                          # 测试代理连接
+docker-sync config set-proxy http://127.0.0.1:7890              # 设置 HTTP 代理
+docker-sync config set-proxy socks5://127.0.0.1:1080            # 设置 SOCKS5 代理
+docker-sync config set-proxy http://user:pass@127.0.0.1:7890    # 带认证的 HTTP 代理
+docker-sync config set-proxy socks5://user:pass@127.0.0.1:1080  # 带认证的 SOCKS5 代理
+docker-sync config clear-proxy                                   # 清除代理
+docker-sync config show                                          # 显示配置
+docker-sync config test-proxy                                    # 测试代理连接
 ```
 
 ### 4. 使用镜像
@@ -212,7 +214,7 @@ docker-sync auth login
 
 ### 代理设置
 
-如果不能直接访问 GitHub API，可以设置代理：
+如果访问 GitHub API 困难，可以设置代理：
 
 ```bash
 # 设置 HTTP 代理
@@ -220,6 +222,10 @@ docker-sync config set-proxy http://127.0.0.1:7890
 
 # 设置 SOCKS5 代理  
 docker-sync config set-proxy socks5://127.0.0.1:1080
+
+# 设置带用户名密码认证的代理
+docker-sync config set-proxy http://username:password@127.0.0.1:7890
+docker-sync config set-proxy socks5://username:password@127.0.0.1:1080
 
 # 测试代理连接
 docker-sync config test-proxy
@@ -230,6 +236,13 @@ docker-sync config clear-proxy
 # 查看当前配置（包括代理设置）
 docker-sync config show
 ```
+
+**支持的代理格式：**
+- `http://127.0.0.1:7890` - HTTP 代理
+- `https://127.0.0.1:7890` - HTTPS 代理
+- `socks5://127.0.0.1:1080` - SOCKS5 代理
+- `http://user:pass@127.0.0.1:7890` - 带认证的 HTTP 代理
+- `socks5://user:pass@127.0.0.1:1080` - 带认证的 SOCKS5 代理
 
 **代理测试示例输出：**
 ```

@@ -68,7 +68,7 @@ async fn main() -> Result<()> {
                         .arg(
                             Arg::new("proxy")
                                 .required(true)
-                                .help("Proxy URL (e.g., http://127.0.0.1:7890, socks5://127.0.0.1:1080)")
+                                .help("Proxy URL (支持 http://, https://, socks5://, 可包含用户名密码: user:pass@host:port)")
                         )
                 )
                 .subcommand(
@@ -126,6 +126,7 @@ async fn main() -> Result<()> {
                 println!("  docker-sync nginx:alpine               同步 nginx:alpine");
                 println!("  docker-sync pull redis:7 mysql:8.0     批量同步");
                 println!("  docker-sync config set-proxy http://127.0.0.1:7890");
+                println!("  docker-sync config set-proxy socks5://user:pass@127.0.0.1:1080");
                 println!();
                 println!("更多帮助: docker-sync --help");
             }
@@ -514,7 +515,7 @@ async fn handle_config(matches: &clap::ArgMatches) -> Result<()> {
         }
         _ => {
             println!("可用的配置命令:");
-            println!("  set-proxy <URL>  - 设置代理 (支持 http:// 和 socks5://)");
+            println!("  set-proxy <URL>  - 设置代理 (支持 http://, https://, socks5://)");
             println!("  clear-proxy      - 清除代理设置");
             println!("  show             - 显示当前配置");
             println!("  test-proxy       - 测试代理连接");
@@ -522,6 +523,7 @@ async fn handle_config(matches: &clap::ArgMatches) -> Result<()> {
             println!("代理示例:");
             println!("  docker-sync config set-proxy http://127.0.0.1:7890");
             println!("  docker-sync config set-proxy socks5://127.0.0.1:1080");
+            println!("  docker-sync config set-proxy http://user:pass@127.0.0.1:7890");
             Ok(())
         }
     }
